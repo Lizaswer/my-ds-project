@@ -2,7 +2,7 @@
 
 
 def add(a: int, b: int) -> int:
-    return a + str(b)
+    return a + b
 
 
 def greet(name: str) -> str:
