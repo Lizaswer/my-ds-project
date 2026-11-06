@@ -1,0 +1,47 @@
+services:
+  rustfs:
+    image: rustfs/rustfs:1.0.0-beta.7  # Фиксированная версия, не latest
+    container_name: rustfs-server
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - RUSTFS_VOLUMES=/data
+      - RUSTFS_ADDRESS=0.0.0.0:9000
+      - RUSTFS_CONSOLE_ADDRESS=0.0.0.0:9001
+      - RUSTFS_CONSOLE_ENABLE=true
+      - RUSTFS_ACCESS_KEY=${S3_ACCESS_KEY}
+      - RUSTFS_SECRET_KEY=${S3_SECRET_KEY}
+    volumes:
+      - rustfs_data:/data  # Именованный volume, данные не теряются
+    healthcheck:
+      # Healthcheck, чтобы зависимые контейнеры ждали готовности
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:9000/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  # Отдельный init-контейнер для создания бакета
+  create-bucket:
+    image: pgsty/minio:latest
+    depends_on:
+      rustfs:
+        condition: service_healthy
+    environment:
+      - S3_ACCESS_KEY=${S3_ACCESS_KEY}
+      - S3_SECRET_KEY=${S3_SECRET_KEY}
+      - S3_BUCKET=${S3_BUCKET}
+    entrypoint: >
+      /bin/sh -c "
+      echo 'Waiting for RustFS...';
+      until /usr/bin/mcli alias set myrustfs http://rustfs:9000 $$S3_ACCESS_KEY $$S3_SECRET_KEY; do
+        sleep 1;
+      done;
+      echo 'Creating bucket...';
+      /usr/bin/mcli mb --ignore-existing myrustfs/$$S3_BUCKET;
+      echo 'Bucket created successfully.';
+      "
+
+volumes:
+  rustfs_data:
