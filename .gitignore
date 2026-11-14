@@ -33,3 +33,10 @@ models/
 # IDE
 .vscode/
 .idea/
+
+best_model.pt
+confusion_matrix*.png
+metrics.json
+# Local experiment-generated files
+configs/temp_*.yaml
+

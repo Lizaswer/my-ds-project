@@ -1,0 +1,11 @@
+.venv
+data
+.git
+.mypy_cache
+.ruff_cache
+__pycache__
+*.pyc
+.env
+best_model.pt
+confusion_matrix*.png
+metrics.json
