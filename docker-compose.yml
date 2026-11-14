@@ -127,6 +127,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        GIT_COMMIT: unknown
     container_name: trainer
     depends_on:
       rustfs:

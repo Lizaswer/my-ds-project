@@ -2,7 +2,8 @@ FROM python:3.12.8-slim
 
 COPY --from=ghcr.io/astral-sh/uv:0.8.14 /uv /uvx /bin/
 
-RUN apt-get update     && apt-get install -y --no-install-recommends git     && rm -rf /var/lib/apt/lists/*
+ARG GIT_COMMIT=unknown
+ENV GIT_COMMIT=
 
 WORKDIR /app
 COPY . .

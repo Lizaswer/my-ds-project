@@ -36,6 +36,9 @@ S3_BUCKET = os.getenv("S3_BUCKET", "my-ds-bucket")
 
 def get_git_commit() -> str:
     """Возвращает хеш текущего коммита."""
+    build_commit = os.getenv("GIT_COMMIT")
+    if build_commit:
+        return build_commit
     try:
         return subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip()
     except Exception:
