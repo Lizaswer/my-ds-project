@@ -1,4 +1,4 @@
-.PHONY: setup check lint types s3-up s3-down ingest data
+.PHONY: setup check lint types s3-up s3-down ingest data infra-up experiments infra-down
 
 # --- Из ДЗ №1 ---
 setup:
@@ -23,7 +23,7 @@ s3-up:
 
 # 2. Остановить хранилище S3
 s3-down:
-	docker compose down
+	docker compose down --remove-orphans
 
 # 3. Загрузить сырые данные в S3
 ingest:
@@ -35,9 +35,23 @@ ingest:
 VERSION ?= v1
 SEED ?= 42
 VAL_SIZE ?= 5000
+CONFIG ?= configs/grid.yaml
 
 data:
 	uv run python -m my_ds_project.processing.convert
 	uv run python -m my_ds_project.processing.split --seed $(SEED) --val-size $(VAL_SIZE)
 	uv run python -m my_ds_project.processing.stats
 	uv run python -m my_ds_project.processing.upload --version $(VERSION) --seed $(SEED) --val-size $(VAL_SIZE)
+
+	# ... ваши старые цели ...
+
+infra-up:
+	docker compose build trainer
+	docker compose up -d rustfs mlflow postgres
+
+
+experiments:
+	docker compose run --rm trainer uv run --no-dev python -m my_ds_project.run_experiments --grid-config $(CONFIG)
+
+infra-down:
+	docker compose down --remove-orphans
