@@ -47,7 +47,7 @@ data:
 
 infra-up:
 	docker compose build trainer
-	docker compose up -d rustfs mlflow postgres
+	docker compose up -d rustfs create-bucket mlflow postgres
 
 
 experiments:
