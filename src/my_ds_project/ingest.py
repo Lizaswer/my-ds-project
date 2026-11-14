@@ -42,7 +42,8 @@ def main() -> None:
 
     # 4. Загружаем в S3
     print(f"Загружаем {archive_path} в S3 как {s3_key}...")
-    s3.upload_file(str(archive_path), bucket, s3_key)
+    with archive_path.open("rb") as archive_file:
+        s3.put_object(Bucket=bucket, Key=s3_key, Body=archive_file)
     print("Загрузка завершена успешно!")
 
 

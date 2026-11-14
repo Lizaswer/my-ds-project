@@ -46,8 +46,8 @@ data:
 	# ... ваши старые цели ...
 
 infra-up:
-	docker compose build trainer
-	docker compose up -d rustfs mlflow postgres
+	docker compose build --build-arg GIT_COMMIT=241130(git rev-parse HEAD) trainer
+	docker compose up -d rustfs create-bucket mlflow postgres
 
 
 experiments:

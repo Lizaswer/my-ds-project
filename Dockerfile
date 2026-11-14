@@ -2,6 +2,9 @@ FROM python:3.12.8-slim
 
 COPY --from=ghcr.io/astral-sh/uv:0.8.14 /uv /uvx /bin/
 
+ARG GIT_COMMIT=unknown
+ENV GIT_COMMIT=${GIT_COMMIT}
+
 WORKDIR /app
 COPY . .
 RUN uv sync --frozen --no-dev
